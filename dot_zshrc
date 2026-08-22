@@ -187,13 +187,6 @@ alias dcr="docker compose restart"
 alias dcl="docker compose logs -f"
 alias dcps="docker compose ps"
 
-# gopass shortcuts
-alias gos='gopass show'
-alias gols='gopass ls'
-alias goi='gopass insert'
-alias gorm='gopass rm'
-alias gop='gopass git push'
-
 # chezmoi shortcuts
 alias cz="chezmoi"
 alias cza="chezmoi apply"
@@ -351,3 +344,7 @@ if [[ -f "$HOME/.atuin/bin/env" ]]; then
   . "$HOME/.atuin/bin/env"
   eval "$(atuin init zsh)"
 fi
+
+
+# Added by Antigravity CLI installer
+export PATH="/home/varun/.local/bin:$PATH"

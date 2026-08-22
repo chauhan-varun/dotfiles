@@ -250,6 +250,19 @@ layout {
     }
 }
 
+// Use a second awww surface for the Mod+O backdrop. The normal awww surface
+// remains the desktop wallpaper.
+layer-rule {
+    // Match awww's namespace with or without its separator.
+    match namespace="^awww-daemon.*overview$"
+    place-within-backdrop true
+}
+
+// Fallback color used only while the wallpaper surface is unavailable.
+overview {
+    backdrop-color "#1d2233"
+}
+
 // Add lines like this to spawn processes at startup.
 // Note that running niri as a session supports xdg-desktop-autostart,
 // which may be more convenient to use.
@@ -257,6 +270,12 @@ layout {
 
 // Start Noctalia Shell through its Quickshell config.
 spawn-at-startup "noctalia"
+
+// Start the Wayland wallpaper daemon, then rotate images from
+// ~/Pictures/Wallpapers. See scripts/rotate-wallpaper.sh to change the interval.
+spawn-at-startup "awww-daemon"
+spawn-at-startup "awww-daemon" "--namespace" "overview"
+spawn-at-startup "/home/varun/.config/niri/scripts/rotate-wallpaper.sh"
 
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
 // spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"
