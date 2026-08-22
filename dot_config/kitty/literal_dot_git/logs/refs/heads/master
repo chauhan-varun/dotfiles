@@ -1,0 +1,2 @@
+0000000000000000000000000000000000000000 56fdabfab287c40688bc7a758f2d799cc8ee48a2 chauhan-varun <varunchauhan097@gmail.com> 1770131798 +0530	commit (initial): first commit
+56fdabfab287c40688bc7a758f2d799cc8ee48a2 a3864c72a2d5178c9bf952a75db700b1f41f3c0b chauhan-varun <varunchauhan097@gmail.com> 1770567871 +0530	commit: feat: Replace custom search kitten with native scrollback pager, update Kitty UI aesthetics, and switch to zsh.

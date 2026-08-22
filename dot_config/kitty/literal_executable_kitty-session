@@ -1,0 +1,118 @@
+#!/bin/bash
+# Kitty session launcher script
+
+SESSIONS_DIR="$HOME/.config/kitty/sessions"
+
+usage() {
+    echo "Kitty Session Manager"
+    echo "Usage: $0 [command] [session_name]"
+    echo ""
+    echo "Commands:"
+    echo "  list             - List available sessions"
+    echo "  new <name>       - Start kitty with session file"
+    echo "  create <name>    - Create a new session interactively"
+    echo "  dev              - Start development session"
+    echo "  simple           - Start simple session"
+    echo ""
+    echo "Keybindings added to your kitty.conf:"
+    echo "  Ctrl+Shift+Enter - New window (pane)"
+    echo "  Ctrl+Shift+-     - Split horizontally"  
+    echo "  Ctrl+Shift+\\    - Split vertically"
+    echo "  Ctrl+Shift+T     - New tab"
+    echo "  Ctrl+Shift+H/J/K/L - Navigate panes"
+    echo "  Ctrl+1-9         - Jump to tab number"
+}
+
+list_sessions() {
+    echo "Available sessions:"
+    if [ -d "$SESSIONS_DIR" ]; then
+        for session in "$SESSIONS_DIR"/*.conf; do
+            if [ -f "$session" ]; then
+                basename "$session" .conf | sed 's/^/  - /'
+            fi
+        done
+    fi
+    
+    if [ ! "$(ls -A $SESSIONS_DIR/*.conf 2>/dev/null)" ]; then
+        echo "  No sessions found"
+    fi
+}
+
+start_session() {
+    local session_name="$1"
+    local session_file="$SESSIONS_DIR/${session_name}.conf"
+    
+    if [ ! -f "$session_file" ]; then
+        echo "Session '$session_name' not found"
+        echo "Available sessions:"
+        list_sessions
+        exit 1
+    fi
+    
+    echo "Starting session: $session_name"
+    kitty --session "$session_file" --detach
+}
+
+create_session() {
+    local session_name="$1"
+    local session_file="$SESSIONS_DIR/${session_name}.conf"
+    
+    if [ -f "$session_file" ]; then
+        echo "Session '$session_name' already exists"
+        read -p "Overwrite? (y/N): " confirm
+        if [[ ! $confirm =~ ^[Yy]$ ]]; then
+            exit 0
+        fi
+    fi
+    
+    echo "Creating session: $session_name"
+    echo "Enter session commands (one per line, empty line to finish):"
+    echo "Common commands:"
+    echo "  new_tab"
+    echo "  set_tab_title <title>"
+    echo "  cd <directory>"
+    echo "  launch --location=hsplit"
+    echo "  launch --location=vsplit"
+    echo ""
+    
+    > "$session_file"
+    while IFS= read -r line; do
+        if [ -z "$line" ]; then
+            break
+        fi
+        echo "$line" >> "$session_file"
+    done
+    
+    echo "Session saved to: $session_file"
+}
+
+case "$1" in
+    list)
+        list_sessions
+        ;;
+    new)
+        if [ -z "$2" ]; then
+            echo "Error: Session name required"
+            usage
+            exit 1
+        fi
+        start_session "$2"
+        ;;
+    create)
+        if [ -z "$2" ]; then
+            echo "Error: Session name required"  
+            usage
+            exit 1
+        fi
+        create_session "$2"
+        ;;
+    dev)
+        start_session "development"
+        ;;
+    simple)
+        start_session "simple"
+        ;;
+    *)
+        usage
+        ;;
+esac

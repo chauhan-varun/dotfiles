@@ -1,0 +1,353 @@
+
+##### ─────────────────────────────────────────────
+#####  ⚡ POWERLEVEL10K INSTANT PROMPT (FAST START)
+##### ─────────────────────────────────────────────
+typeset -g POWERLEVEL10K_INSTANT_PROMPT=quiet
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+##### ─────────────────────────────────────────────
+#####  ⚡ PATHS (keep light + early)
+##### ─────────────────────────────────────────────
+export PATH="$HOME/.local/bin:$PATH"         # User local binaries
+export PATH="$HOME/.npm-global/bin:$PATH"     # User-level npm global binaries (e.g. codex)
+
+
+##### ─────────────────────────────────────────────
+#####  ⚡ ZINIT (PLUGIN MANAGER)
+##### ─────────────────────────────────────────────
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+
+if [[ ! -d "$ZINIT_HOME" ]]; then
+  mkdir -p "$(dirname "$ZINIT_HOME")"
+  git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+fi
+
+source "${ZINIT_HOME}/zinit.zsh"
+
+##### ─────────────────────────────────────────────
+#####  ⚡ PLUGINS (ASYNC where possible)
+##### ─────────────────────────────────────────────
+# Powerlevel10k should load immediately (prompt)
+zinit ice depth=1
+zinit light romkatv/powerlevel10k
+
+# Defer non-critical plugins to speed startup
+zinit ice wait"0" lucid
+zinit light zsh-users/zsh-completions
+
+# Defer autosuggestions to avoid blocking prompt startup
+zinit ice wait"0" lucid
+zinit light zsh-users/zsh-autosuggestions
+
+zinit ice wait"0" lucid
+zinit light Aloxaf/fzf-tab
+
+zinit ice wait"0" lucid
+zinit light zsh-users/zsh-syntax-highlighting
+
+zinit ice wait"0" lucid
+zinit light hlissner/zsh-autopair
+
+##### ─────────────────────────────────────────────
+#####  ⚡ COMPLETIONS (RUN ONCE ONLY)
+##### ─────────────────────────────────────────────
+autoload -Uz compinit
+
+# Use a cached zcompdump; regenerate if missing, older than 24h, or zshrc was changed
+ZCOMPDUMP="${XDG_CACHE_HOME:-$HOME/.cache}/zcompdump-${ZSH_VERSION}"
+if [[ ! -f "$ZCOMPDUMP" || "$ZCOMPDUMP" -ot "$HOME/.zshrc" ]] || \
+   [[ $(find "$ZCOMPDUMP" -mtime +1 2>/dev/null) ]]; then
+  compinit -d "$ZCOMPDUMP"
+else
+  compinit -C -d "$ZCOMPDUMP"   # -C skips security checks for speed
+fi
+
+##### ─────────────────────────────────────────────
+#####  ⚡ POWERLEVEL10K CONFIG
+##### ─────────────────────────────────────────────
+[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
+
+##### ─────────────────────────────────────────────
+#####  ⚡ FZF keybindings (LOAD ONLY IF PRESENT)
+##### ─────────────────────────────────────────────
+# On Ubuntu the faster/common path is often:
+#   /usr/share/fzf/key-bindings.zsh
+# Fallback to doc examples if needed.
+if [[ -f /usr/share/fzf/key-bindings.zsh ]]; then
+  source /usr/share/fzf/key-bindings.zsh
+elif [[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]]; then
+  source /usr/share/doc/fzf/examples/key-bindings.zsh
+fi
+
+##### ─────────────────────────────────────────────
+#####  ⚡ KEYBINDINGS
+##### ─────────────────────────────────────────────
+bindkey -e
+bindkey '^p' history-search-backward
+bindkey '^n' history-search-forward
+
+##### ─────────────────────────────────────────────
+#####  ⚡ HISTORY SETTINGS
+##### ─────────────────────────────────────────────
+HISTSIZE=50000
+SAVEHIST=50000
+HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history"
+mkdir -p "${HISTFILE:h}"
+
+setopt appendhistory          # Append to history file (don't overwrite)
+setopt sharehistory           # Share history across all open sessions
+setopt hist_ignore_space      # Don't save commands prefixed with a space
+setopt hist_find_no_dups      # Skip duplicates when searching history
+setopt hist_save_no_dups      # Don't write duplicate entries to history file
+setopt hist_ignore_all_dups   # Remove older duplicate entries from history
+
+##### ─────────────────────────────────────────────
+#####  ⚡ LOOK & COMPLETION SETTINGS
+##### ─────────────────────────────────────────────
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+zstyle ':completion:*' menu select
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':fzf-tab:complete:*' fzf-preview 'ls -l --color=always $realpath'
+
+##### ─────────────────────────────────────────────
+#####  ⚡ ALIASES
+##### ─────────────────────────────────────────────
+alias c='clear'
+alias vim='nvim'
+alias cpu='mpstat 1 1 | awk "/all/ {print \"CPU Usage:\", 100-\$NF\"%\"}"'
+alias cat='bat'
+alias ssh='TERM=xterm-256color ssh'
+alias cl='curlie'
+alias phone='gio mount "mtp://Xiaomi_Redmi_13C_5G_OJ5DEQJNDQR8PZMV/" && cd /run/user/$(id -u)/gvfs/*'
+
+# alias ls='eza --icons'
+alias ll='eza -l --icons'
+alias la='eza -la --icons'
+alias lt='eza -T --icons'
+
+alias gcl='git clone'
+alias gi='git init && git add .'
+alias ga='git add .'
+alias gc='git commit -m'
+alias gcv='git commit --no-verify -m'
+alias gca='git commit -am'
+alias gs='git status'
+alias gst='git stash'
+alias gsp='git stash pop'
+alias gl='git pull'
+alias glu='git pull upstream'
+alias gp='git push'
+alias gpm='git push origin main'
+alias gpf='git push --force-with-lease'
+alias guc='git reset --soft HEAD~1'
+alias glg='git log --oneline --graph --decorate --all'
+alias gw='git switch'
+alias gco='git checkout'
+
+alias daemon-off='sudo systemctl stop docker'
+alias daemon-on='sudo systemctl start docker'
+
+alias p='pnpm add'
+alias pe='pnpm exec'
+alias pi='pnpm install'
+alias n='npm install'
+alias pd='pnpm dev'
+alias nd='doppler run -- pnpm run dev'
+alias td='doppler run -- turbo dev'
+alias lg='lazygit'
+alias ld='lazydocker'
+
+# doppler shortcuts
+alias dop="doppler"
+alias dopr="doppler run --"
+alias dopp="doppler run --config prd --"
+alias dops="doppler secrets"
+alias dopls="doppler secrets list"
+
+# docker shortcuts
+alias d="docker"
+alias dsts="docker stats"
+alias dps="docker ps"
+alias dpsa="docker ps -a"
+alias di="docker images"
+alias drmi="docker rmi"
+alias dvol="docker volume"
+alias dex="docker exec -it"
+alias dlog="docker logs -f"
+alias dsp="docker stop"
+alias dst="docker start"
+alias drm="docker rm"
+
+alias dc="docker compose"
+alias dcup="docker compose up -d"
+alias dcd="docker compose down"
+alias dcr="docker compose restart"
+alias dcl="docker compose logs -f"
+alias dcps="docker compose ps"
+
+# gopass shortcuts
+alias gos='gopass show'
+alias gols='gopass ls'
+alias goi='gopass insert'
+alias gorm='gopass rm'
+alias gop='gopass git push'
+
+# chezmoi shortcuts
+alias cz="chezmoi"
+alias cza="chezmoi apply"
+alias cze="chezmoi edit"
+alias czd="chezmoi diff"
+alias czs="chezmoi status"
+
+
+alias fixcomp='rm -f ${XDG_CACHE_HOME:-$HOME/.cache}/zcompdump* && compinit && echo "✔ completions updated"'
+alias zr='source ~/.zshrc && echo "🔄 Reloaded"'
+
+alias ..='cd ..'
+alias ...='cd ../..'
+alias please='sudo $(fc -ln -1)'
+
+
+##### ─────────────────────────────────────────────
+#####  ⚡ FUNCTIONS
+##### ─────────────────────────────────────────────
+# Print the MTP URIs of connected devices
+_mtp_devices() {
+    gio mount -li |
+        sed -nE 's/^[[:space:]]*(activation_root|default_location)=(mtp:\/\/.*)$/\2/p' |
+        sort -u
+}
+
+# Mount all connected MTP devices
+connect() {
+    local uris uri mount_dir
+    uris="$(_mtp_devices)"
+
+    if [[ -z "$uris" ]]; then
+        echo "❌ No MTP phone detected."
+        echo "Unlock it and select USB → File Transfer."
+        return 1
+    fi
+
+    while IFS= read -r uri; do
+        [[ -z "$uri" ]] && continue
+
+        if gio mount "$uri" 2>/dev/null; then
+            echo "✅ Connected: $uri"
+        elif gio list "$uri" >/dev/null 2>&1; then
+            echo "✅ Already connected: $uri"
+        else
+            echo "❌ Failed: $uri"
+        fi
+    done <<< "$uris"
+
+    mount_dir="$(
+        find "/run/user/$UID/gvfs" \
+            -mindepth 1 -maxdepth 1 \
+            -name 'mtp:*' -print -quit 2>/dev/null
+    )"
+
+    if [[ -n "$mount_dir" && -d "$mount_dir" ]]; then
+        cd -- "$mount_dir" || return 1
+        echo "📱 Entered: $PWD"
+        ls
+    else
+        echo "❌ Phone mounted, but mount directory was not found."
+        return 1
+    fi
+}
+
+# Unmount all connected MTP devices
+disconnect() {
+    local uri found=0
+
+    if [[ "$PWD" == /run/user/$UID/gvfs/mtp:* ]]; then
+        cd ~
+    fi
+
+    while IFS= read -r uri; do
+        [[ -z "$uri" ]] && continue
+
+        if gio mount -u "$uri" 2>/dev/null; then
+            echo "✅ Disconnected: $uri"
+            found=1
+        fi
+    done <<< "$(_mtp_devices)"
+
+    (( found )) || echo "No mounted MTP phone found."
+}
+gorg() {
+  read -q "REPLY?⚠️ Reset to origin/main and DELETE all local changes? (y/n) "
+  echo
+  [[ $REPLY == "y" ]] && git fetch origin && git reset --hard origin/main
+}
+
+killport() {
+  if [[ -z "$1" ]]; then
+    echo "Usage: killport <port>"
+  else
+    kill -9 "$(lsof -ti :"$1")" 2>/dev/null && \
+    echo "✔ Killed process on port $1" || echo "No process found"
+  fi
+}
+
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	command yazi "$@" --cwd-file="$tmp"
+	IFS= read -r -d '' cwd < "$tmp"
+	[ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
+	command rm -f -- "$tmp"
+}
+crun() {
+  local file="$1"
+  [[ -z "$file" ]] && echo "Usage: crun <file.cpp>" && return 1
+  local output="${file%.*}"
+  g++ "$file" -o "$output" && "./$output"
+}
+
+czsync() {
+  msg="${1:-update dotfiles}"
+  chezmoi status | awk '{print $2}' | xargs -r chezmoi add
+  chezmoi git add .
+  chezmoi git commit -- -m "$msg"
+  chezmoi git push
+}
+
+##### ─────────────────────────────────────────────
+#####  ⚡ FZF CONFIG (with fd)
+##### ─────────────────────────────────────────────
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND='fd --type d --hidden --follow'
+
+##### ─────────────────────────────────────────────
+#####  ⚡ ZOXIDE
+##### ─────────────────────────────────────────────
+eval "$(zoxide init zsh)"
+alias j='z'
+alias ji='zi'
+
+##### ─────────────────────────────────────────────
+#####  ⚡ AUTOCD
+##### ─────────────────────────────────────────────
+setopt autocd
+
+##### ─────────────────────────────────────────────
+#####  ⚡ PNPM PATH
+##### ─────────────────────────────────────────────
+export PNPM_HOME="$HOME/.pnpm-global"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+
+##### ─────────────────────────────────────────────
+#####  ⚡ ATUIN (DEFERRED a bit but still works)
+##### ─────────────────────────────────────────────
+# Load env only if present
+if [[ -f "$HOME/.atuin/bin/env" ]]; then
+  . "$HOME/.atuin/bin/env"
+  eval "$(atuin init zsh)"
+fi

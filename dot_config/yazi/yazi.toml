@@ -1,0 +1,14 @@
+[opener]
+imv = [
+	{ run = 'imv-dir "$1"', orphan = true, for = "unix" },
+]
+edit = [
+	{ run = 'nvim "$@"', block = true, for = "unix" },
+]
+
+[open]
+rules = [
+	{ mime = "image/*", use = "imv" },
+	{ mime = "text/*", use = "edit" },
+	{ mime = "application/{json,javascript,toml,xml,yaml}", use = "edit" },
+]

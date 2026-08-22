@@ -1,0 +1,5 @@
+[binds]
+h = prev
+j = prev
+l = next
+d = exec gio trash "$imv_current_file"; close
