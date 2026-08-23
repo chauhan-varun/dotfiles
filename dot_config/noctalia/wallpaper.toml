@@ -1,0 +1,13 @@
+# Noctalia wallpaper configuration
+# Use custom wallpapers from ~/Pictures/Wallpapers instead of the default owl
+
+[wallpaper]
+directory = "/home/varun/Pictures/Wallpapers"
+enabled = true
+transition_on_startup = true
+
+    [wallpaper.automation]
+    enabled = true
+    interval_seconds = 1800
+    order = "random"
+    recursive = true

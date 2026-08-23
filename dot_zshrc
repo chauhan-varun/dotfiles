@@ -37,8 +37,9 @@ zinit light romkatv/powerlevel10k
 zinit ice wait"0" lucid
 zinit light zsh-users/zsh-completions
 
-# Defer autosuggestions to avoid blocking prompt startup
-zinit ice wait"0" lucid
+# Load autosuggestions with the first prompt. Deferring it can leave a new
+# terminal without suggestions until the first command refreshes ZLE.
+zinit ice lucid
 zinit light zsh-users/zsh-autosuggestions
 
 zinit ice wait"0" lucid
@@ -93,7 +94,8 @@ bindkey '^n' history-search-forward
 ##### ─────────────────────────────────────────────
 HISTSIZE=50000
 SAVEHIST=50000
-HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history"
+# Export this so tools such as `atuin import auto` can discover Zsh history.
+export HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history"
 mkdir -p "${HISTFILE:h}"
 
 setopt appendhistory          # Append to history file (don't overwrite)
@@ -189,11 +191,8 @@ alias dcps="docker compose ps"
 
 # chezmoi shortcuts
 alias cz="chezmoi"
-alias cza="chezmoi apply"
-alias cze="chezmoi edit"
+alias cza="chezmoi add"
 alias czd="chezmoi diff"
-alias czs="chezmoi status"
-
 
 alias fixcomp='rm -f ${XDG_CACHE_HOME:-$HOME/.cache}/zcompdump* && compinit && echo "✔ completions updated"'
 alias zr='source ~/.zshrc && echo "🔄 Reloaded"'
@@ -339,9 +338,9 @@ esac
 ##### ─────────────────────────────────────────────
 #####  ⚡ ATUIN (DEFERRED a bit but still works)
 ##### ─────────────────────────────────────────────
-# Load env only if present
-if [[ -f "$HOME/.atuin/bin/env" ]]; then
-  . "$HOME/.atuin/bin/env"
+# Initialize the installed Atuin command. The old ~/.atuin/bin/env installer
+# file is not present, so guarding on it prevented command recording entirely.
+if (( $+commands[atuin] )); then
   eval "$(atuin init zsh)"
 fi
 

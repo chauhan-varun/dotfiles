@@ -1,14 +1,113 @@
+# ──────────────────────────────────────────────
+#  Yazi Configuration — yazi.toml
+# ──────────────────────────────────────────────
+
+#:schema https://yazi-rs.github.io/schemas/yazi.json
+
+# ── Manager ──────────────────────────────────
+[mgr]
+ratio          = [1, 4, 3]
+sort_by        = "natural"
+sort_dir_first = true
+show_hidden    = false
+show_symlink   = true
+
+# ── Preview ──────────────────────────────────
+[preview]
+max_width  = 1920
+max_height = 1080
+image_delay = 30
+
+# ── Openers ──────────────────────────────────
 [opener]
-imv = [
-	{ run = 'imv-dir "$1"', orphan = true, for = "unix" },
-]
+
+# Text / Code — opens in neovim (blocking)
 edit = [
-	{ run = 'nvim "$@"', block = true, for = "unix" },
+	{ run = 'nvim %s', block = true, desc = "Neovim", for = "linux" },
 ]
 
+# Images — imv (background)
+image = [
+	{ run = 'imv-dir %s1', orphan = true, desc = "imv", for = "linux" },
+]
+
+# Video / Audio — mpv (background)
+play = [
+	{ run = 'mpv --force-window %s1', orphan = true, desc = "mpv", for = "linux" },
+]
+
+# PDF / eBooks — open in Brave
+pdf = [
+	{ run = 'brave %s1', orphan = true, desc = "Brave (PDF)", for = "linux" },
+]
+
+# Archives — extract
+extract = [
+	{ run = "ya pub extract --list %s", desc = "Extract here" },
+]
+
+# General open — system default for anything else
+open = [
+	{ run = 'xdg-open %s1', desc = "System default", for = "linux" },
+]
+
+# Reveal in file manager
+reveal = [
+	{ run = 'xdg-open %d1', desc = "Reveal", for = "linux" },
+]
+
+# ── Open Rules ───────────────────────────────
+#  Maps MIME types / globs to the openers above.
+#  Rules are evaluated top-to-bottom; first match wins.
 [open]
-rules = [
-	{ mime = "image/*", use = "imv" },
-	{ mime = "text/*", use = "edit" },
-	{ mime = "application/{json,javascript,toml,xml,yaml}", use = "edit" },
+prepend_rules = [
+	# ── Images — imv ──
+	{ mime = "image/*", use = ["image", "open", "reveal"] },
+
+	# ── Video (explicit extensions) ──
+	{ url = "*.mp4",  use = ["play", "reveal"] },
+	{ url = "*.webm", use = ["play", "reveal"] },
+	{ url = "*.mkv",  use = ["play", "reveal"] },
+	{ url = "*.avi",  use = ["play", "reveal"] },
+	{ url = "*.mov",  use = ["play", "reveal"] },
+	{ url = "*.flv",  use = ["play", "reveal"] },
+	{ url = "*.wmv",  use = ["play", "reveal"] },
+	{ url = "*.ts",   use = ["play", "reveal"] },
+
+	# ── Video / Audio (mime fallback) ──
+	{ mime = "{audio,video}/*", use = ["play", "reveal"] },
+
+	# ── PDF & eBooks — Brave ──
+	{ mime = "application/pdf",  use = ["pdf", "open", "reveal"] },
+	{ url = "*.pdf",             use = ["pdf", "open", "reveal"] },
+	{ mime = "application/epub*", use = ["pdf", "open", "reveal"] },
+
+	# ── Text / Code ──
+	{ mime = "text/*", use = ["edit", "reveal"] },
+	{ mime = "application/{json,ndjson,javascript,typescript,toml,xml,yaml,x-yaml,x-toml,x-shellscript,wine-extension-ini}", use = ["edit", "reveal"] },
+	{ mime = "inode/empty", use = ["edit", "reveal"] },
+
+	# ── Archives (by extension) ──
+	{ url = "*.zip",     use = ["extract", "reveal"] },
+	{ url = "*.tar",     use = ["extract", "reveal"] },
+	{ url = "*.tar.gz",  use = ["extract", "reveal"] },
+	{ url = "*.tgz",     use = ["extract", "reveal"] },
+	{ url = "*.tar.bz2", use = ["extract", "reveal"] },
+	{ url = "*.tar.xz",  use = ["extract", "reveal"] },
+	{ url = "*.tar.zst", use = ["extract", "reveal"] },
+	{ url = "*.gz",      use = ["extract", "reveal"] },
+	{ url = "*.bz2",     use = ["extract", "reveal"] },
+	{ url = "*.xz",      use = ["extract", "reveal"] },
+	{ url = "*.zst",     use = ["extract", "reveal"] },
+	{ url = "*.7z",      use = ["extract", "reveal"] },
+	{ url = "*.rar",     use = ["extract", "reveal"] },
+	{ url = "*.iso",     use = ["extract", "reveal"] },
+	{ url = "*.deb",     use = ["extract", "reveal"] },
+	{ url = "*.rpm",     use = ["extract", "reveal"] },
+	# ── Archives (by mime) ──
+	{ mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", use = ["extract", "reveal"] },
+	{ mime = "application/x-{tar,compressed,xz,bzip*,gzip,lzip,lzma,7z-compressed,rar}", use = ["extract", "reveal"] },
+
+	# ── Fallback: everything else ──
+	{ url = "*", use = ["open", "reveal"] },
 ]

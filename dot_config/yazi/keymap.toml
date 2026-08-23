@@ -1,0 +1,50 @@
+# ──────────────────────────────────────────────
+#  Yazi Keybindings — keymap.toml
+# ──────────────────────────────────────────────
+
+[mgr]
+prepend_keymap = [
+
+	# ── Quick directory jumps (g + key) ──────
+	{ on = ["g", "w"], run = "cd ~/web",        desc = "Go to ~/web" },
+	{ on = ["g", "v"], run = "cd ~/Videos",     desc = "Go to ~/Videos" },
+	{ on = ["g", "d"], run = "cd ~/Documents",  desc = "Go to ~/Documents" },
+	{ on = ["g", "D"], run = "cd ~/Downloads",  desc = "Go to ~/Downloads" },
+	{ on = ["g", "p"], run = "cd ~/Pictures",   desc = "Go to ~/Pictures" },
+	{ on = ["g", "c"], run = "cd ~/.config",    desc = "Go to ~/.config" },
+	{ on = ["g", "."], run = "cd ~/.local/share/chezmoi",   desc = "Go to ~/.local/share/chezmoi" },
+	{ on = ["g", "t"], run = "cd /tmp",         desc = "Go to /tmp" },
+
+	# ── Open interactively (choose app) ─────
+	{ on = ["O"],      run = "open --interactive", desc = "Open with…" },
+
+	# ── Shell shortcuts ─────────────────────
+	{ on = ["!"],      run = 'shell "$SHELL" --block', desc = "Open shell here" },
+
+	# ── Create / Rename ─────────────────────
+	{ on = ["a"],      run = "create",           desc = "Create file/dir" },
+	{ on = ["r"],      run = "rename --cursor=before_ext", desc = "Rename (cursor before ext)" },
+
+	# ── Bulk rename ─────────────────────────
+	{ on = ["b", "r"], run = "bulk_rename", desc = "Bulk rename" },
+
+	# ── Selection helpers ───────────────────
+	{ on = ["V"],      run = "visual_mode --unset", desc = "Visual mode (unset)" },
+
+	# ── Copy path shortcuts (c = copy) ──────
+	# These live on the `c` prefix, not `y`. A `y`-prefixed chord would shadow
+	# the default single-key `y` = yank, breaking copy/paste of actual files.
+	{ on = ["c", "p"], run = "copy path",        desc = "Copy file path" },
+	{ on = ["c", "d"], run = "copy dirpath",     desc = "Copy dir path" },
+	{ on = ["c", "f"], run = "copy filename",    desc = "Copy filename" },
+	{ on = ["c", "n"], run = "copy name_without_ext", desc = "Copy name (no ext)" },
+
+	# ── Compress selected files ─────────────
+	{ on = ["b", "z"], run = 'shell "tar -czvf archive.tar.gz %s" --block', desc = "Compress to tar.gz" },
+
+	# ── Change permissions ──────────────────
+	{ on = ["c", "h"], run = 'shell "chmod +x %s" --block', desc = "chmod +x" },
+
+	# ── Toggle hidden files ─────────────────
+	{ on = ["."],      run = "hidden toggle",    desc = "Toggle hidden files" },
+]

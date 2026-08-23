@@ -1,3 +1,4 @@
+
 // This config is in the KDL format: https://kdl.dev
 // "/-" comments out the following node.
 // Check the wiki for a full description of the configuration:
@@ -250,15 +251,19 @@ layout {
     }
 }
 
-// Use a second awww surface for the Mod+O backdrop. The normal awww surface
-// remains the desktop wallpaper.
+// Noctalia handles wallpapers natively — no need for awww-daemon.
+// It draws two background layer surfaces:
+//   noctalia-wallpaper — the sharp wallpaper for the normal view (left alone).
+//   noctalia-backdrop  — a blurred + tinted copy of the same image, enabled by
+//                        [backdrop] in ~/.config/noctalia/backdrop.toml.
+// Placing only the latter in the backdrop gives a blurred wallpaper in the
+// overview (Mod+O) while the normal view stays sharp.
 layer-rule {
-    // Match awww's namespace with or without its separator.
-    match namespace="^awww-daemon.*overview$"
+    match namespace="^noctalia-backdrop$"
     place-within-backdrop true
 }
 
-// Fallback color used only while the wallpaper surface is unavailable.
+// Fallback color, seen only while the backdrop surface is unavailable.
 overview {
     backdrop-color "#1d2233"
 }
@@ -269,13 +274,14 @@ overview {
 // See the binds section below for more spawn examples.
 
 // Start Noctalia Shell through its Quickshell config.
+// Noctalia manages wallpapers from ~/Pictures/Wallpapers with auto-rotation.
 spawn-at-startup "noctalia"
 
-// Start the Wayland wallpaper daemon, then rotate images from
-// ~/Pictures/Wallpapers. See scripts/rotate-wallpaper.sh to change the interval.
-spawn-at-startup "awww-daemon"
-spawn-at-startup "awww-daemon" "--namespace" "overview"
-spawn-at-startup "/home/varun/.config/niri/scripts/rotate-wallpaper.sh"
+// awww-daemon and rotate-wallpaper.sh are no longer needed — noctalia
+// handles wallpaper display and rotation natively via wallpaper.toml.
+// spawn-at-startup "awww-daemon"
+// spawn-at-startup "awww-daemon" "--namespace" "overview"
+// spawn-at-startup "/home/varun/.config/niri/scripts/rotate-wallpaper.sh"
 
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
 // spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"
@@ -396,8 +402,8 @@ binds {
     // Example volume keys mappings for PipeWire & WirePlumber.
     // The allow-when-locked=true property makes them work even when the session is locked.
     // Using spawn-sh allows to pass multiple arguments together with the command.
-    // "-l 1.0" limits the volume to 100%.
-    XF86AudioRaiseVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.03+ -l 1.0"; }
+    // "-l 1.5" limits the volume to 150%.
+    XF86AudioRaiseVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.03+ -l 1.5"; }
     XF86AudioLowerVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.03-"; }
     XF86AudioMute        allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"; }
     XF86AudioMicMute     allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"; }
@@ -601,7 +607,13 @@ binds {
     // Makes the column "fill the rest of the space".
     Mod+Ctrl+F { expand-column-to-available-width; }
 
-    Mod+C { center-column; }
+    // Rotate the wallpaper on demand. Advances through Noctalia's shuffle order,
+    // so every press lands on a different image from ~/Pictures/Wallpapers.
+    // The blurred overview backdrop follows along automatically.
+    Mod+C { spawn "noctalia" "msg" "wallpaper-next"; }
+
+    // center-column moved off Mod+C to make room for the wallpaper bind above.
+    Mod+Shift+C { center-column; }
 
     // Center all fully visible columns on screen.
     Mod+Ctrl+C { center-visible-columns; }
