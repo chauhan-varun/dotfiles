@@ -26,13 +26,14 @@ return {
         -- Skip formatting when triggered by auto-save (InsertLeave / TextChanged).
         -- Format only fires on an intentional  :w  so half-written code is never mangled.
         if vim.g.auto_save_abort then return nil end
-        -- Disable format-on-save for C/C++ (no universally agreed style)
-        local disable_filetypes = { c = true, cpp = true }
+        -- Keep C/C++ and Java on-demand, matching the manual <leader>cf workflow.
+        local disable_filetypes = { c = true, cpp = true, java = true }
         if disable_filetypes[vim.bo[bufnr].filetype] then return nil end
         return { timeout_ms = 500, lsp_format = 'fallback' }
       end,
       formatters_by_ft = {
         lua             = { 'stylua' },
+        java            = { 'google-java-format' },
         javascript      = { 'prettierd', stop_after_first = true },
         javascriptreact = { 'prettierd', stop_after_first = true },
         typescript      = { 'prettierd' },

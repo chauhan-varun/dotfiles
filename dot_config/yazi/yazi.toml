@@ -41,6 +41,11 @@ pdf = [
 	{ run = 'brave %s1', orphan = true, desc = "Brave (PDF)", for = "linux" },
 ]
 
+# Spreadsheets / CSV — LibreOffice Calc (background)
+calc = [
+	{ run = 'libreoffice --calc %s1', orphan = true, desc = "LibreOffice Calc", for = "linux" },
+]
+
 # Archives — extract
 extract = [
 	{ run = "ya pub extract --list %s", desc = "Extract here" },
@@ -81,6 +86,10 @@ prepend_rules = [
 	{ mime = "application/pdf",  use = ["pdf", "open", "reveal"] },
 	{ url = "*.pdf",             use = ["pdf", "open", "reveal"] },
 	{ mime = "application/epub*", use = ["pdf", "open", "reveal"] },
+
+	# ── CSV — LibreOffice Calc ──
+	# Must precede text/* because CSV files are commonly identified as text/csv.
+	{ url = "*.csv", use = ["calc", "reveal"] },
 
 	# ── Text / Code ──
 	{ mime = "text/*", use = ["edit", "reveal"] },

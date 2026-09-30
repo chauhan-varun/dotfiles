@@ -134,6 +134,10 @@ return {
       local servers = {
         clangd = {},
 
+        -- Eclipse JDT Language Server: Java diagnostics, completion, navigation,
+        -- and document formatting (used by conform's LSP fallback).
+        jdtls = {},
+
         -- Emmet: HTML / CSS / JSX / TSX completions and expansion
         emmet_ls = {
           filetypes = { 'html', 'css', 'javascriptreact', 'typescriptreact' },
@@ -182,6 +186,8 @@ return {
         'stylua',            -- Lua formatter
         'emmet-ls',          -- Emmet for HTML / CSS / JSX / TSX
         'clangd',            -- C/C++ LSP
+        'jdtls',             -- Java LSP, completion, and formatting
+        'google-java-format', -- Java formatter used by conform.nvim
         'eslint_d',          -- JS/TS linter (fast daemon)
         'prettierd',         -- JS/TS/HTML/CSS formatter (fast daemon)
         'vtsls',             -- TypeScript/JavaScript LSP

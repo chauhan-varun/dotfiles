@@ -123,6 +123,7 @@ alias cat='bat'
 alias ssh='TERM=xterm-256color ssh'
 alias cl='curlie'
 alias phone='gio mount "mtp://Xiaomi_Redmi_13C_5G_OJ5DEQJNDQR8PZMV/" && cd /run/user/$(id -u)/gvfs/*'
+alias btop='btop --force-utf'
 
 # alias ls='eza --icons'
 alias ll='eza -l --icons'
@@ -299,6 +300,13 @@ crun() {
   g++ "$file" -o "$output" && "./$output"
 }
 
+jrun() {
+  local file="$1"
+  [[ -z "$file" ]] && echo "Usage: jrun <file.java>" && return 1
+  local dir="$(dirname "$file")"
+  local name="$(basename "$file" .java)"
+  javac "$file" -d "$dir" && java -cp "$dir" "$name"
+}
 czsync() {
   msg="${1:-update dotfiles}"
   chezmoi status | awk '{print $2}' | xargs -r chezmoi add
@@ -347,3 +355,6 @@ fi
 
 # Added by Antigravity CLI installer
 export PATH="/home/varun/.local/bin:$PATH"
+
+# opencode
+export PATH=/home/varun/.opencode/bin:$PATH

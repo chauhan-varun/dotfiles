@@ -12,7 +12,7 @@ return {
       -- Parsers to always keep installed
       ensure_installed = {
         'bash', 'c', 'cpp', 'diff', 'html', 'css',
-        'javascript', 'json', 'lua', 'luadoc',
+        'java', 'javascript', 'json', 'lua', 'luadoc',
         'markdown', 'markdown_inline', 'query',
         'prisma',
         'tsx', 'typescript', 'vim', 'vimdoc',
