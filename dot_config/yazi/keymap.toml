@@ -7,6 +7,7 @@ prepend_keymap = [
 
 	# ── Quick directory jumps (g + key) ──────
 	{ on = ["g", "w"], run = "cd ~/web",        desc = "Go to ~/web" },
+	{ on = ["g", "b"], run = "cd ~/.local/share/Trash/files", desc = "Go to Trash" },
 	{ on = ["g", "v"], run = "cd ~/Videos",     desc = "Go to ~/Videos" },
 	{ on = ["g", "d"], run = "cd ~/Documents",  desc = "Go to ~/Documents" },
 	{ on = ["g", "D"], run = "cd ~/Downloads",  desc = "Go to ~/Downloads" },

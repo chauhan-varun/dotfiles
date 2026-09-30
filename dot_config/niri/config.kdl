@@ -49,8 +49,8 @@ input {
     mouse {
         // off
         // natural-scroll
-        // accel-speed 0.2
-        // accel-profile "flat"
+        accel-speed 0.0
+        accel-profile "flat"
         // scroll-method "no-scroll"
     }
 
@@ -390,6 +390,11 @@ binds {
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+Return hotkey-overlay-title="Open a Terminal: kitty" { spawn "kitty"; }
+    Super+Z hotkey-overlay-title="Open zCode" { spawn "/home/varun/Apps/ZCode-3.14.4-linux-x64.AppImage"; }
+    Super+Shift+Z hotkey-overlay-title="Open Zed Editor" { spawn "/home/varun/.local/bin/zed"; }
+    Super+W hotkey-overlay-title="Open Brave" { spawn "brave"; }
+    Super+Shift+W hotkey-overlay-title="Open Chrome" { spawn "google-chrome-stable"; }
+    Super+X hotkey-overlay-title="Open btop" { spawn "kitty" "btop"; }
     Mod+Space hotkey-overlay-title="Open Noctalia Launcher" { spawn "noctalia" "msg" "panel-toggle" "launcher"; }
     Mod+V hotkey-overlay-title="Open Clipboard History" { spawn "noctalia" "msg" "panel-toggle" "clipboard"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
@@ -639,12 +644,21 @@ binds {
 
     Mod+W hotkey-overlay-title="Open Brave" { spawn "brave"; }
     Super+N hotkey-overlay-title="Open Network" { spawn "noctalia" "msg" "panel-toggle" "control-center" "network"; }
-    Mod+T hotkey-overlay-title="Open Antigravity IDE" { spawn "antigravity-ide"; }
+    Super+A hotkey-overlay-title="Open Antigravity IDE" { spawn "antigravity-ide"; }
+    Super+T hotkey-overlay-title="Open Telegram" { spawn "Telegram"; }
+    Super+S hotkey-overlay-title="Open VS Code" { spawn "code"; }
     Mod+E hotkey-overlay-title="Open Yazi" { spawn "kitty" "yazi"; }
     Super+B hotkey-overlay-title="Open Bluetooth" { spawn "noctalia" "msg" "panel-toggle" "control-center" "bluetooth"; }
     Super+M hotkey-overlay-title="Open Notifications" { spawn "noctalia" "msg" "panel-toggle" "control-center" "notifications"; }
-    Super+A hotkey-overlay-title="Open Volume" { spawn "noctalia" "msg" "panel-toggle" "control-center" "audio"; }
+    Super+U hotkey-overlay-title="Toggle Volume Controller" { spawn "noctalia" "msg" "panel-toggle" "control-center" "audio"; }
     Super+P hotkey-overlay-title="Open Power Menu" { spawn "noctalia" "msg" "panel-toggle" "session"; }
+
+    // One-shot solve
+    Ctrl+Alt+S hotkey-overlay-title="One-Shot Solve" { spawn-sh "/usr/bin/uv run --directory /home/varun/web/smartSolve smartsolve --yes --log-file /home/varun/web/smartSolve/smartsolve.log"; }
+
+    Ctrl+Alt+D hotkey-overlay-title="Write Solution" { spawn-sh "/usr/bin/uv run --directory /home/varun/web/smartSolve smartsolve --write-solution --type-solution --language C++17 --delay 3 --yes --log-file /home/varun/web/smartSolve/smartsolve.log"; }
+
+    Ctrl+Alt+X hotkey-overlay-title="Stop Solve" { spawn "/home/varun/.config/niri/scripts/stop-smartsolve.sh"; }
 
     // Actions to switch layouts.
     // Note: if you uncomment these, make sure you do NOT have
