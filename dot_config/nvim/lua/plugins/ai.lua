@@ -6,36 +6,45 @@
 return {
 
   -- ---------------------------------------------------------------------------
-  -- Supermaven: ultra-fast, lightweight AI code completion
-  --   <C-n>        — accept full suggestion
+  -- NeoCodeium: free AI code completion (inline virtual text)
+  --   <C-l>        — accept full suggestion
   --   <C-j>        — accept next word
-  --   <C-l>        — accept next line
   --   <C-e>        — clear/dismiss suggestion
-  --   <leader>ts   — toggle Supermaven on/off
+  --   <M-]>        — cycle to next suggestion
+  --   <M-[>        — cycle to previous suggestion
+  --   <leader>tc   — toggle NeoCodeium on/off
+  --
+  --   First run:  :NeoCodeium auth  to sign in
   -- ---------------------------------------------------------------------------
   {
-    'supermaven-inc/supermaven-nvim',
+    'monkoose/neocodeium',
     event = 'VeryLazy',
     config = function()
-      require('supermaven-nvim').setup {
-        keymaps = {
-          accept_suggestion = '<C-l>',
-          clear_suggestion  = '<C-e>',
-          accept_word       = '<C-j>',
+      local neocodeium = require 'neocodeium'
+
+      neocodeium.setup {
+        silent = true,
+        debounce = false, -- request suggestions immediately as you type
+        max_lines = 2000, -- parse fewer surrounding lines for faster payload generation
+        filetypes = {
+          help = false,
+          gitcommit = false,
+          gitrebase = false,
+          ['.'] = false,
         },
       }
 
-      -- Toggle Supermaven on or off with user-friendly notifications
-      vim.keymap.set('n', '<leader>ts', function()
-        local api = require 'supermaven-nvim.api'
-        if api.is_running() then
-          api.stop()
-          vim.notify('Supermaven stopped', vim.log.levels.INFO, { title = 'Supermaven' })
-        else
-          api.start()
-          vim.notify('Supermaven started', vim.log.levels.INFO, { title = 'Supermaven' })
-        end
-      end, { desc = '[T]oggle [S]upermaven' })
+      -- Keymaps (NeoCodeium doesn't set any by default)
+      vim.keymap.set('i', '<C-l>', neocodeium.accept, { desc = 'Accept suggestion' })
+      vim.keymap.set('i', '<C-j>', neocodeium.accept_word, { desc = 'Accept word' })
+      vim.keymap.set('i', '<C-e>', neocodeium.clear, { desc = 'Clear suggestion' })
+      vim.keymap.set('i', '<M-]>', function() neocodeium.cycle_or_complete(1) end, { desc = 'Next suggestion' })
+      vim.keymap.set('i', '<M-[>', function() neocodeium.cycle_or_complete(-1) end, { desc = 'Prev suggestion' })
+
+      -- Toggle NeoCodeium on or off
+      vim.keymap.set('n', '<leader>tc', function()
+        vim.cmd 'NeoCodeium toggle'
+      end, { desc = '[T]oggle Neo[C]odeium' })
     end,
   },
 }

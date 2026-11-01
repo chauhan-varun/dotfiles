@@ -24,6 +24,8 @@ return {
             'rafamadriz/friendly-snippets',
             config = function()
               require('luasnip.loaders.from_vscode').lazy_load()
+              -- Load custom snippets (e.g. CP template) from ~/.config/nvim/snippets/
+              require('luasnip.loaders.from_vscode').lazy_load({ paths = { vim.fn.stdpath('config') .. '/snippets' } })
             end,
           },
         },

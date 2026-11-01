@@ -276,7 +276,48 @@ gorg() {
   echo
   [[ $REPLY == "y" ]] && git fetch origin && git reset --hard origin/main
 }
+usbdrive() {
+    local -a parts
+    local d mp
 
+    # unmounted, hotplug partitions that have a filesystem (4 fields = no mountpoint)
+    parts=( ${(f)"$(lsblk -pnro NAME,TYPE,HOTPLUG,FSTYPE,MOUNTPOINT |
+        awk '$2=="part" && $3==1 && NF==4 {print $1}')"} )
+
+    if (( ${#parts} == 0 )); then
+        echo "❌ No unmounted USB drive partition found."
+        lsblk -o NAME,SIZE,FSTYPE,MOUNTPOINT,HOTPLUG
+        return 1
+    fi
+
+    for d in $parts; do
+        if udisksctl mount -b "$d" >/dev/null 2>&1; then
+            echo "✅ Mounted: $d"
+        else
+            echo "❌ Failed: $d"
+        fi
+    done
+
+    mp="$(findmnt -nro TARGET -S "${parts[1]}")"
+    if [[ -n "$mp" ]]; then
+        cd -- "$mp" && echo "💾 Entered: $PWD" && ls
+    fi
+}
+
+usbeject() {
+    local -a parts
+    local d
+    [[ "$PWD" == /run/media/$USER/* || "$PWD" == /media/$USER/* ]] && cd ~
+
+    parts=( ${(f)"$(lsblk -pnro NAME,TYPE,HOTPLUG,MOUNTPOINT |
+        awk '$2=="part" && $3==1 && NF==4 {print $1}')"} )
+
+    for d in $parts; do
+        udisksctl unmount -b "$d" && echo "✅ Unmounted: $d"
+    done
+    # optional: power off the whole disk
+    # udisksctl power-off -b /dev/sdb
+}
 killport() {
   if [[ -z "$1" ]]; then
     echo "Usage: killport <port>"
@@ -305,7 +346,8 @@ jrun() {
   [[ -z "$file" ]] && echo "Usage: jrun <file.java>" && return 1
   local dir="$(dirname "$file")"
   local name="$(basename "$file" .java)"
-  javac "$file" -d "$dir" && java -cp "$dir" "$name"
+  local output="$dir/.jrun"
+  mkdir -p "$output" && javac -d "$output" "$file" && java -cp "$output" "$name"
 }
 czsync() {
   msg="${1:-update dotfiles}"
@@ -358,3 +400,4 @@ export PATH="/home/varun/.local/bin:$PATH"
 
 # opencode
 export PATH=/home/varun/.opencode/bin:$PATH
+
